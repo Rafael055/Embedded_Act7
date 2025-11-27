@@ -2,6 +2,8 @@ from gpiozero import LED, Buzzer as GpioZeroBuzzer
 from gpiozero.pins.lgpio import LGPIOFactory
 from gpiozero import Device
 import time
+import adafruit_dht
+import board
 
 # Set the pin factory to lgpio for Raspberry Pi 5 / newer OS
 Device.pin_factory = LGPIOFactory()
@@ -11,6 +13,7 @@ Device.pin_factory = LGPIOFactory()
 # White LED - Pin 40 -> GPIO 21
 # Blue LED - Pin 38 -> GPIO 20
 # Red LED - Pin 36 -> GPIO 16
+# DHT11 - Pin 32 -> GPIO 12
 
 class LEDController:
     def __init__(self):
@@ -19,12 +22,16 @@ class LEDController:
         self.WHITE_GPIO = 21    # Physical Pin 40
         self.BLUE_GPIO = 20     # Physical Pin 38
         self.RED_GPIO = 16      # Physical Pin 36
+        self.DHT_GPIO = 12      # Physical Pin 32
         
         # Initialize components using gpiozero
         self.white_led = LED(self.WHITE_GPIO)
         self.blue_led = LED(self.BLUE_GPIO)
         self.red_led = LED(self.RED_GPIO)
         self.buzzer = GpioZeroBuzzer(self.BUZZER_GPIO)
+        
+        # Initialize DHT11 sensor
+        self.dht_sensor = adafruit_dht.DHT11(board.D12)
         
         # Initial state - all off
         self.led_states = {
@@ -98,6 +105,48 @@ class LEDController:
         self.buzzer.off()
         self.led_states['buzzer'] = False
     
+    def blink_white(self, times=3, interval=0.3):
+        """Blink white LED"""
+        for _ in range(times):
+            self.white_led.on()
+            time.sleep(interval)
+            self.white_led.off()
+            time.sleep(interval)
+        self.led_states['white'] = False
+    
+    def blink_blue(self, times=3, interval=0.3):
+        """Blink blue LED"""
+        for _ in range(times):
+            self.blue_led.on()
+            time.sleep(interval)
+            self.blue_led.off()
+            time.sleep(interval)
+        self.led_states['blue'] = False
+    
+    def blink_red(self, times=3, interval=0.3):
+        """Blink red LED"""
+        for _ in range(times):
+            self.red_led.on()
+            time.sleep(interval)
+            self.red_led.off()
+            time.sleep(interval)
+        self.led_states['red'] = False
+    
+    def blink_all(self, times=3, interval=0.3):
+        """Blink all LEDs"""
+        for _ in range(times):
+            self.white_led.on()
+            self.blue_led.on()
+            self.red_led.on()
+            time.sleep(interval)
+            self.white_led.off()
+            self.blue_led.off()
+            self.red_led.off()
+            time.sleep(interval)
+        self.led_states['white'] = False
+        self.led_states['blue'] = False
+        self.led_states['red'] = False
+    
     def all_off(self):
         self.white_led.off()
         self.blue_led.off()
@@ -121,12 +170,35 @@ class LEDController:
     def get_states(self):
         return self.led_states
     
+    def get_dht_reading(self):
+        """Read temperature and humidity from DHT11 sensor"""
+        try:
+            temperature = self.dht_sensor.temperature
+            humidity = self.dht_sensor.humidity
+            return {
+                'success': True,
+                'temperature': temperature,
+                'humidity': humidity
+            }
+        except RuntimeError as e:
+            # DHT sensors can occasionally fail to read
+            return {
+                'success': False,
+                'error': str(e)
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
     def cleanup(self):
         self.all_off()
         self.white_led.close()
         self.blue_led.close()
         self.red_led.close()
         self.buzzer.close()
+        self.dht_sensor.exit()
 
 
 # For testing
@@ -148,7 +220,7 @@ if __name__ == "__main__":
     time.sleep(1)
     
     print("Buzzer test")
-    controller.buzz(0.3)
+    controller.buzz(5)
     
     print("All OFF")
     controller.all_off()

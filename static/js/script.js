@@ -19,10 +19,30 @@ document.addEventListener('DOMContentLoaded', function () {
   const redLedIcon = document.getElementById('redLedIcon');
   const buzzerIcon = document.getElementById('buzzerIcon');
 
+  // Voice selection elements
+  const voiceMaleBtn = document.getElementById('voiceMale');
+  const voiceFemaleBtn = document.getElementById('voiceFemale');
+  const testVoiceBtn = document.getElementById('testVoiceBtn');
+
+  // Robot elements
+  const robotLeftEye = document.getElementById('robotLeftEye');
+  const robotRightEye = document.getElementById('robotRightEye');
+  const robotNose = document.getElementById('robotNose');
+  const robotMouth = document.getElementById('robotMouth');
+  const robotMessage = document.getElementById('robotMessage');
+  const antennaLight = document.getElementById('antennaLight');
+  const robotTemp = document.getElementById('robotTemp');
+  const robotHumidity = document.getElementById('robotHumidity');
+  const robotStatus = document.getElementById('robotStatus');
+  const robotStatusTagalog = document.getElementById('robotStatusTagalog');
+
   // State
   let currentLanguage = 'en-US';
+  let currentVoiceType = 'male'; // 'male' or 'female'
   let isListening = false;
   let recognition = null;
+  let synthesis = window.speechSynthesis;
+  let voices = [];
 
   // Translations
   const translations = {
@@ -34,7 +54,22 @@ document.addEventListener('DOMContentLoaded', function () {
       ledControls: 'LED Controls',
       allOn: 'All ON',
       allOff: 'All OFF',
-      commandsHelp: 'Available Commands:'
+      allBlink: 'Blink All',
+      commandsHelp: 'Available Commands:',
+      dhtTitle: 'Temperature & Humidity',
+      dhtFetching: 'Fetching sensor data...',
+      dhtUpdated: 'Last updated:',
+      dhtError: 'Error reading sensor',
+      voiceSelectTitle: 'Voice Assistant',
+      maleVoice: 'Male Voice',
+      femaleVoice: 'Female Voice',
+      testVoice: 'Test Voice',
+      robotTitle: 'Mini-Bot Assistant',
+      robotReady: 'Ready to assist!',
+      robotListening: 'Listening...',
+      robotExecuted: 'Command executed!',
+      robotError: 'Command not recognized',
+      testMessage: 'Hello! I am your voice assistant. How can I help you today?'
     },
     'fil-PH': {
       voiceControl: 'Kontrol ng Boses',
@@ -44,9 +79,140 @@ document.addEventListener('DOMContentLoaded', function () {
       ledControls: 'Kontrol ng LED',
       allOn: 'Lahat ON',
       allOff: 'Lahat OFF',
-      commandsHelp: 'Mga Available na Utos:'
+      allBlink: 'Kumukurap Lahat',
+      commandsHelp: 'Mga maaring i-utos:',
+      dhtTitle: 'Temperatura at Halumigmig',
+      dhtFetching: 'Kinukuha ang datos...',
+      dhtUpdated: 'Huling update:',
+      dhtError: 'Error sa pagbasa ng sensor',
+      voiceSelectTitle: 'Boses ng Assistant',
+      maleVoice: 'Boses Lalaki',
+      femaleVoice: 'Boses Babae',
+      testVoice: 'Subukan ang Boses',
+      robotTitle: 'Mini-Bot na Katulong',
+      robotReady: 'Handa na ako!',
+      robotListening: 'Nakikinig...',
+      robotExecuted: 'Naisakatuparan ang utos!',
+      robotError: 'Hindi maintindihan ang utos',
+      testMessage: 'Kamusta! Ako ang iyong voice assistant. Paano kita matutulungan?'
     }
   };
+
+  // Load available voices
+  function loadVoices() {
+    voices = synthesis.getVoices();
+  }
+
+  loadVoices();
+  if (synthesis.onvoiceschanged !== undefined) {
+    synthesis.onvoiceschanged = loadVoices;
+  }
+
+  // Get appropriate voice based on language and type
+  function getVoice() {
+    const langCode = currentLanguage === 'en-US' ? 'en' : 'fil';
+    const preferFemale = currentVoiceType === 'female';
+
+    // Try to find a matching voice
+    let selectedVoice = null;
+
+    // First, try to find exact language match with gender preference
+    for (let voice of voices) {
+      const isEnglish = voice.lang.startsWith('en');
+      const isFemale = voice.name.toLowerCase().includes('female') ||
+        voice.name.toLowerCase().includes('woman') ||
+        voice.name.toLowerCase().includes('zira') ||
+        voice.name.toLowerCase().includes('samantha') ||
+        voice.name.toLowerCase().includes('victoria') ||
+        voice.name.toLowerCase().includes('karen') ||
+        voice.name.toLowerCase().includes('moira');
+
+      if (currentLanguage === 'en-US' && isEnglish) {
+        if (preferFemale === isFemale) {
+          selectedVoice = voice;
+          break;
+        } else if (!selectedVoice) {
+          selectedVoice = voice;
+        }
+      } else if (currentLanguage === 'fil-PH') {
+        // For Filipino, fall back to English voices since Filipino TTS is limited
+        if (isEnglish) {
+          if (preferFemale === isFemale) {
+            selectedVoice = voice;
+            break;
+          } else if (!selectedVoice) {
+            selectedVoice = voice;
+          }
+        }
+      }
+    }
+
+    return selectedVoice;
+  }
+
+  // Speak text using TTS
+  function speak(text, callback) {
+    if (!synthesis) return;
+
+    synthesis.cancel(); // Cancel any ongoing speech
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = getVoice();
+
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.lang = currentLanguage === 'fil-PH' ? 'en-US' : currentLanguage;
+    utterance.rate = currentVoiceType === 'male' ? 0.9 : 1.0;
+    utterance.pitch = currentVoiceType === 'male' ? 0.8 : 1.2;
+
+    // Animate robot mouth while speaking
+    utterance.onstart = () => {
+      robotMouth.classList.add('speaking');
+      antennaLight.classList.add('active');
+    };
+
+    utterance.onend = () => {
+      robotMouth.classList.remove('speaking');
+      antennaLight.classList.remove('active');
+      if (callback) callback();
+    };
+
+    synthesis.speak(utterance);
+  }
+
+  // Update robot display
+  function updateRobotMessage(message) {
+    robotMessage.textContent = message;
+  }
+
+  function updateRobotStatus(status, isTagalog = false) {
+    const t = translations[currentLanguage];
+    robotStatus.textContent = status;
+    if (currentLanguage === 'fil-PH') {
+      robotStatusTagalog.classList.remove('hidden');
+    } else {
+      robotStatusTagalog.classList.add('hidden');
+    }
+  }
+
+  // Robot eye blinking animation
+  function robotBlink() {
+    robotLeftEye.classList.add('blinking');
+    robotRightEye.classList.add('blinking');
+    setTimeout(() => {
+      robotLeftEye.classList.remove('blinking');
+      robotRightEye.classList.remove('blinking');
+    }, 300);
+  }
+
+  // Random blinking
+  setInterval(() => {
+    if (Math.random() > 0.7) {
+      robotBlink();
+    }
+  }, 3000);
 
   // Initialize Web Speech API
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -62,17 +228,25 @@ document.addEventListener('DOMContentLoaded', function () {
       recognizedText.textContent = '';
       commandStatus.textContent = '';
       commandStatus.className = 'command-status';
+
+      // Update robot
+      const t = translations[currentLanguage];
+      updateRobotMessage(t.robotListening);
+      updateRobotStatus(t.robotListening);
+      antennaLight.classList.add('active');
     };
 
     recognition.onend = function () {
       isListening = false;
       voiceBtn.classList.remove('listening');
       voiceBtnText.textContent = translations[currentLanguage].startListening;
+      antennaLight.classList.remove('active');
     };
 
     recognition.onresult = function (event) {
       const transcript = event.results[0][0].transcript;
       recognizedText.textContent = `"${transcript}"`;
+      updateRobotMessage(`"${transcript}"`);
       processVoiceCommand(transcript);
     };
 
@@ -81,9 +255,11 @@ document.addEventListener('DOMContentLoaded', function () {
       isListening = false;
       voiceBtn.classList.remove('listening');
       voiceBtnText.textContent = translations[currentLanguage].startListening;
+      antennaLight.classList.remove('active');
 
       if (event.error === 'no-speech') {
         commandStatus.textContent = 'No speech detected. Please try again.';
+        updateRobotMessage('No speech detected');
       } else if (event.error === 'not-allowed') {
         commandStatus.textContent = 'Microphone access denied. Please allow microphone access.';
       } else {
@@ -96,6 +272,26 @@ document.addEventListener('DOMContentLoaded', function () {
     voiceBtnText.textContent = 'Speech not supported';
     console.warn('Web Speech API not supported');
   }
+
+  // Voice type selection
+  voiceMaleBtn.addEventListener('click', function () {
+    currentVoiceType = 'male';
+    voiceMaleBtn.classList.add('active');
+    voiceFemaleBtn.classList.remove('active');
+  });
+
+  voiceFemaleBtn.addEventListener('click', function () {
+    currentVoiceType = 'female';
+    voiceFemaleBtn.classList.add('active');
+    voiceMaleBtn.classList.remove('active');
+  });
+
+  // Test voice button
+  testVoiceBtn.addEventListener('click', function () {
+    const t = translations[currentLanguage];
+    speak(t.testMessage);
+    updateRobotMessage(t.testMessage);
+  });
 
   // Voice button click
   voiceBtn.addEventListener('click', function () {
@@ -132,7 +328,23 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('ledTitle').textContent = t.ledControls;
     document.getElementById('allOnText').textContent = t.allOn;
     document.getElementById('allOffText').textContent = t.allOff;
+    document.getElementById('allBlinkText').textContent = t.allBlink;
     commandsHelpTitle.textContent = t.commandsHelp;
+
+    // Update DHT title
+    const dhtTitle = document.getElementById('dhtTitle');
+    if (dhtTitle) dhtTitle.textContent = t.dhtTitle;
+
+    // Update voice selection text
+    document.getElementById('voiceSelectTitle').textContent = t.voiceSelectTitle;
+    document.getElementById('voiceMaleText').textContent = t.maleVoice;
+    document.getElementById('voiceFemaleText').textContent = t.femaleVoice;
+    document.getElementById('testVoiceText').textContent = t.testVoice;
+
+    // Update robot text
+    document.getElementById('robotTitle').textContent = t.robotTitle;
+    updateRobotStatus(t.robotReady);
+    robotStatusTagalog.textContent = translations['fil-PH'].robotReady;
 
     // Show/hide command lists
     commandsEnglish.classList.toggle('hidden', lang !== 'en-US');
@@ -142,6 +354,14 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.led-label-tagalog').forEach(el => {
       el.classList.toggle('hidden', lang !== 'fil-PH');
     });
+
+    // Show/hide DHT Tagalog labels
+    document.querySelectorAll('.dht-label-tagalog').forEach(el => {
+      el.classList.toggle('hidden', lang !== 'fil-PH');
+    });
+
+    // Show/hide robot Tagalog status
+    robotStatusTagalog.classList.toggle('hidden', lang !== 'fil-PH');
 
     // Save to server
     fetch('/api/set_language', {
@@ -161,11 +381,23 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       const data = await response.json();
+      const t = translations[currentLanguage];
 
       if (data.success) {
-        commandStatus.textContent = `✓ Command executed: ${formatAction(data.action)}`;
+        const actionText = formatAction(data.action);
+        commandStatus.textContent = `✓ Command executed: ${actionText}`;
         commandStatus.className = 'command-status success';
         updateLEDStates(data.states);
+        updateRobotLEDs(data.states);
+
+        // Speak confirmation
+        const confirmMsg = currentLanguage === 'en-US'
+          ? `${actionText} done!`
+          : `${actionText} tapos na!`;
+        speak(confirmMsg);
+        updateRobotMessage(confirmMsg);
+        updateRobotStatus(t.robotExecuted);
+
       } else if (data.invalid_color) {
         // Show notification for invalid color
         showNotification(data.message);
@@ -175,13 +407,31 @@ document.addEventListener('DOMContentLoaded', function () {
         // Trigger buzzer animation
         buzzerIcon.classList.add('on');
         setTimeout(() => buzzerIcon.classList.remove('on'), 500);
+
+        // Speak error
+        const errorMsg = currentLanguage === 'en-US'
+          ? `Sorry, ${data.color} LED is not available. Only white, blue, and red LEDs are available.`
+          : `Pasensya, ang ${data.color} na LED ay hindi available. White, blue, at red LED lamang ang available.`;
+        speak(errorMsg);
+        updateRobotMessage(data.message);
+        updateRobotStatus(t.robotError);
+
       } else {
         commandStatus.textContent = `✗ ${data.error || 'Command not recognized'}`;
         commandStatus.className = 'command-status error';
+
+        // Speak error
+        const errorMsg = currentLanguage === 'en-US'
+          ? "Sorry, I didn't understand that command. Please try again."
+          : "Pasensya, hindi ko naintindihan. Pakiulit.";
+        speak(errorMsg);
+        updateRobotMessage(errorMsg);
+        updateRobotStatus(t.robotError);
       }
 
       if (data.states) {
         updateLEDStates(data.states);
+        updateRobotLEDs(data.states);
       }
     } catch (error) {
       console.error('Error processing command:', error);
@@ -190,16 +440,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // Update robot LEDs (eyes and nose)
+  function updateRobotLEDs(states) {
+    // Left eye = Blue LED
+    robotLeftEye.classList.toggle('on', states.blue);
+
+    // Right eye = Red LED
+    robotRightEye.classList.toggle('on', states.red);
+
+    // Nose = White LED
+    robotNose.classList.toggle('on', states.white);
+  }
+
   function formatAction(action) {
     const actionLabels = {
       'white_on': 'White LED ON',
       'white_off': 'White LED OFF',
+      'white_blink': 'White LED Blinking',
       'blue_on': 'Blue LED ON',
       'blue_off': 'Blue LED OFF',
+      'blue_blink': 'Blue LED Blinking',
       'red_on': 'Red LED ON',
       'red_off': 'Red LED OFF',
+      'red_blink': 'Red LED Blinking',
       'all_on': 'All LEDs ON',
       'all_off': 'All LEDs OFF',
+      'all_blink': 'All LEDs Blinking',
       'buzzer': 'Buzzer activated'
     };
     return actionLabels[action] || action;
@@ -215,6 +481,9 @@ document.addEventListener('DOMContentLoaded', function () {
       buzzerIcon.classList.add('on');
       setTimeout(() => buzzerIcon.classList.remove('on'), 300);
     }
+
+    // Also update robot LEDs
+    updateRobotLEDs(states);
   }
 
   // LED button controls
@@ -237,6 +506,10 @@ document.addEventListener('DOMContentLoaded', function () {
             buzzerIcon.classList.add('on');
             setTimeout(() => buzzerIcon.classList.remove('on'), 300);
           }
+
+          // Update robot message
+          const actionText = `${led.charAt(0).toUpperCase() + led.slice(1)} ${action.toUpperCase()}`;
+          updateRobotMessage(actionText);
         }
       } catch (error) {
         console.error('Error controlling LED:', error);
@@ -269,6 +542,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // All Blink button
+  document.getElementById('allBlinkBtn').addEventListener('click', async function () {
+    try {
+      const response = await fetch('/api/led/all/blink', { method: 'POST' });
+      const data = await response.json();
+      if (data.success) {
+        updateLEDStates(data.states);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+
+  // DHT11 Sensor Reading
+  const temperatureValue = document.getElementById('temperatureValue');
+  const humidityValue = document.getElementById('humidityValue');
+  const dhtStatus = document.getElementById('dhtStatus');
+
+  async function fetchDHTData() {
+    try {
+      const response = await fetch('/api/dht');
+      const data = await response.json();
+      const t = translations[currentLanguage];
+
+      if (data.success) {
+        const temp = data.temperature !== null ? data.temperature : '--';
+        const hum = data.humidity !== null ? data.humidity : '--';
+
+        temperatureValue.textContent = temp;
+        humidityValue.textContent = hum;
+
+        // Update robot ear displays
+        robotTemp.textContent = temp;
+        robotHumidity.textContent = hum;
+
+        const now = new Date().toLocaleTimeString();
+        dhtStatus.textContent = `${t.dhtUpdated} ${now}`;
+        dhtStatus.className = 'dht-status success';
+      } else {
+        dhtStatus.textContent = t.dhtError;
+        dhtStatus.className = 'dht-status error';
+      }
+    } catch (error) {
+      console.error('Error fetching DHT data:', error);
+      const t = translations[currentLanguage];
+      dhtStatus.textContent = t.dhtError;
+      dhtStatus.className = 'dht-status error';
+    }
+  }
+
+  // Fetch DHT data every 3 seconds
+  fetchDHTData();
+  setInterval(fetchDHTData, 3000);
+
   // Notification
   function showNotification(message) {
     notificationText.textContent = message;
@@ -291,6 +618,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const data = await response.json();
       if (data.success) {
         updateLEDStates(data.states);
+        updateRobotLEDs(data.states);
       }
     } catch (error) {
       console.error('Error fetching initial state:', error);
@@ -298,4 +626,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   fetchInitialState();
+
+  // Welcome message on load
+  setTimeout(() => {
+    const t = translations[currentLanguage];
+    updateRobotMessage(t.robotReady);
+  }, 500);
 });

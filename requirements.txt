@@ -3,3 +3,4 @@ SpeechRecognition
 pyaudio
 gpiozero
 lgpio
+adafruit-circuitpython-dht

@@ -27,20 +27,28 @@ COMMANDS = {
         'red_off': ['turn off red', 'red off', 'red led off', 'turn red off', 'turn off the red', 'turn off red led'],
         'all_on': ['turn on all', 'all on', 'all lights on', 'turn all on', 'turn on all lights'],
         'all_off': ['turn off all', 'all off', 'all lights off', 'turn all off', 'turn off all lights'],
+        'white_blink': ['blink white', 'white blink', 'blink white led', 'flash white', 'white flash'],
+        'blue_blink': ['blink blue', 'blue blink', 'blink blue led', 'flash blue', 'blue flash'],
+        'red_blink': ['blink red', 'red blink', 'blink red led', 'flash red', 'red flash'],
+        'all_blink': ['blink all', 'all blink', 'blink all lights', 'flash all', 'all flash'],
         'buzzer': ['buzzer', 'buzz', 'beep', 'sound'],
         # Color keywords for detection
         'valid_colors': ['white', 'blue', 'red'],
         'invalid_color_keywords': ['green', 'yellow', 'orange', 'purple', 'pink', 'black', 'brown', 'grey', 'gray', 'violet', 'cyan', 'magenta']
     },
     'fil-PH': {
-        'white_on': ['buksan puti', 'puti bukas', 'i-on puti', 'buksan ang puti', 'puting ilaw bukas'],
-        'white_off': ['patayin puti', 'puti patay', 'i-off puti', 'patayin ang puti', 'puting ilaw patay'],
-        'blue_on': ['buksan asul', 'asul bukas', 'i-on asul', 'buksan ang asul', 'asul na ilaw bukas'],
-        'blue_off': ['patayin asul', 'asul patay', 'i-off asul', 'patayin ang asul', 'asul na ilaw patay'],
-        'red_on': ['buksan pula', 'pula bukas', 'i-on pula', 'buksan ang pula', 'pulang ilaw bukas'],
-        'red_off': ['patayin pula', 'pula patay', 'i-off pula', 'patayin ang pula', 'pulang ilaw patay'],
-        'all_on': ['buksan lahat', 'lahat bukas', 'i-on lahat', 'buksan ang lahat'],
-        'all_off': ['patayin lahat', 'lahat patay', 'i-off lahat', 'patayin ang lahat'],
+        'white_on': ['buksan ang puting LED', 'puting ilaw i-bukas', 'i on puting ilaw', 'buksan ang puting ilaw'],
+        'white_off': ['patayin ang puting LED', 'puting ilaw patayin', 'i off puting ilaw', 'patayin ang puting ilaw', 'puting ilaw patayin'],
+        'blue_on': ['buksan ang asul na ilaw', 'asul na ilaw i-bukas', 'i on asul na ilaw', 'buksan ang asul na ilaw', 'asul na ilaw i-bukas'],
+        'blue_off': ['patayin ang asul na ilaw', 'asul na ilaw patayin', 'i off asul na ilaw', 'patayin ang asul na ilaw', 'asul na ilaw patay'],
+        'red_on': ['buksan ang pulang ilaw', 'pulang ilaw i-bukas', 'i on pulang ilaw', 'buksan ang pulang ilaw', 'pulang ilaw i-bukas'],
+        'red_off': ['patayin ang pulang ilaw', 'pulang ilaw patayin', 'i off pulang ilaw', 'patayin ang pulang ilaw', 'pulang ilaw patay'],
+        'all_on': ['buksan ang lahat ng ilaw', 'lahat bukas', 'i on lahat', 'buksan ang lahat ng ilaw'],
+        'all_off': ['patayin ang lahat ng ilaw', 'lahat ng ilaw patayin', 'i-off lahat', 'i-off lahat ng ilaw'],
+        'white_blink': ['kumukurap na puting  ilaw', 'i blink ang puting ilaw', 'pakurap-kurap na puting ilaw', 'puting ilaw na kumukurap'],
+        'blue_blink': ['kumukurap na asul  ilaw', 'i blink ang asul na ilaw', 'pakurap-kurap na asul na ilaw', 'asul na ilaw na kumukurap'],
+        'red_blink': ['kumukurap na pulang ilaw', 'i blink ang pulang ilaw', 'pakurap-kurap na pulang ilaw', 'pulang ilaw na kumukurap'],
+        'all_blink': ['kumukurap ang lahat ng ilaw', 'i blink lahat', 'pakurap-kurap ang lahat ng ilaw', 'lahat ay kumukurap'],
         'buzzer': ['buzzer', 'tunog', 'beep'],
         'valid_colors': ['puti', 'asul', 'pula'],
         'invalid_color_keywords': ['berde', 'dilaw', 'orange', 'lila', 'rosas', 'itim', 'kayumanggi', 'abo', 'violet']
@@ -87,6 +95,14 @@ def execute_command(action):
         led_controller.all_on()
     elif action == 'all_off':
         led_controller.all_off()
+    elif action == 'white_blink':
+        led_controller.blink_white()
+    elif action == 'blue_blink':
+        led_controller.blink_blue()
+    elif action == 'red_blink':
+        led_controller.blink_red()
+    elif action == 'all_blink':
+        led_controller.blink_all()
     elif action == 'buzzer':
         led_controller.buzz(0.3)
     else:
@@ -106,16 +122,22 @@ def control_led(led_name, action):
         if led_name == 'white':
             if action == 'on':
                 led_controller.turn_on_white()
+            elif action == 'blink':
+                led_controller.blink_white()
             else:
                 led_controller.turn_off_white()
         elif led_name == 'blue':
             if action == 'on':
                 led_controller.turn_on_blue()
+            elif action == 'blink':
+                led_controller.blink_blue()
             else:
                 led_controller.turn_off_blue()
         elif led_name == 'red':
             if action == 'on':
                 led_controller.turn_on_red()
+            elif action == 'blink':
+                led_controller.blink_red()
             else:
                 led_controller.turn_off_red()
         elif led_name == 'buzzer':
@@ -123,6 +145,8 @@ def control_led(led_name, action):
         elif led_name == 'all':
             if action == 'on':
                 led_controller.all_on()
+            elif action == 'blink':
+                led_controller.blink_all()
             else:
                 led_controller.all_off()
         
@@ -140,6 +164,12 @@ def get_states():
         'success': True,
         'states': led_controller.get_states()
     })
+
+@app.route('/api/dht', methods=['GET'])
+def get_dht():
+    """Get DHT11 temperature and humidity reading"""
+    reading = led_controller.get_dht_reading()
+    return jsonify(reading)
 
 @app.route('/api/set_language', methods=['POST'])
 def set_language():
