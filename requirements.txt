@@ -1,1 +1,5 @@
 flask
+SpeechRecognition
+pyaudio
+gpiozero
+lgpio

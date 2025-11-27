@@ -4,41 +4,154 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flask App</title>
+  <title>Voice Controlled LEDs</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
   <div class="container">
     <header>
-      <h1>Welcome to My Flask App</h1>
+      <h1><i class="fas fa-microphone"></i> Voice Controlled LEDs</h1>
+      <p class="subtitle">Control your LEDs with voice commands</p>
     </header>
 
-    <main>
-      <div class="card">
-        <h2>Hello World!</h2>
-        <p>This is a simple Flask website with CSS and JavaScript.</p>
-        <button id="greetBtn" class="btn">Click Me</button>
-        <p id="message" class="message"></p>
+    <!-- Language Selection -->
+    <div class="card language-card">
+      <h2><i class="fas fa-language"></i> Language / Wika</h2>
+      <div class="language-selector">
+        <button id="langEnglish" class="lang-btn active" data-lang="en-US">
+          <span class="flag">🇺🇸</span> English
+        </button>
+        <button id="langTagalog" class="lang-btn" data-lang="fil-PH">
+          <span class="flag">🇵🇭</span> Tagalog
+        </button>
       </div>
+    </div>
 
-      <div class="card">
-        <h2>Counter</h2>
-        <p>Count: <span id="counter">0</span></p>
-        <div class="btn-group">
-          <button id="decrementBtn" class="btn btn-secondary">-</button>
-          <button id="incrementBtn" class="btn btn-secondary">+</button>
-          <button id="resetBtn" class="btn">Reset</button>
+    <!-- Voice Control Section -->
+    <div class="card voice-card">
+      <h2><i class="fas fa-microphone-alt"></i> <span id="voiceTitle">Voice Control</span></h2>
+      <div class="voice-control">
+        <button id="voiceBtn" class="voice-btn">
+          <i class="fas fa-microphone"></i>
+          <span id="voiceBtnText">Start Listening</span>
+        </button>
+        <div id="listeningIndicator" class="listening-indicator hidden">
+          <div class="pulse-ring"></div>
+          <i class="fas fa-microphone"></i>
         </div>
       </div>
-    </main>
+      <p id="recognizedText" class="recognized-text"></p>
+      <p id="commandStatus" class="command-status"></p>
 
-    <footer>
-      <p>&copy; 2025 Flask App</p>
-    </footer>
-  </div>
+      <!-- Voice Commands Help -->
+      <div class="commands-help">
+        <h3 id="commandsHelpTitle">Available Commands:</h3>
+        <div id="commandsEnglish" class="commands-list">
+          <span class="command-tag">Turn on white</span>
+          <span class="command-tag">Turn off white</span>
+          <span class="command-tag">Turn on blue</span>
+          <span class="command-tag">Turn off blue</span>
+          <span class="command-tag">Turn on red</span>
+          <span class="command-tag">Turn off red</span>
+          <span class="command-tag">All on</span>
+          <span class="command-tag">All off</span>
+        </div>
+        <div id="commandsTagalog" class="commands-list hidden">
+          <span class="command-tag">Buksan puti</span>
+          <span class="command-tag">Patayin puti</span>
+          <span class="command-tag">Buksan asul</span>
+          <span class="command-tag">Patayin asul</span>
+          <span class="command-tag">Buksan pula</span>
+          <span class="command-tag">Patayin pula</span>
+          <span class="command-tag">Buksan lahat</span>
+          <span class="command-tag">Patayin lahat</span>
+        </div>
+      </div>
+    </div>
 
-  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- LED Controls -->
+    <div class="card led-card">
+      <h2><i class="fas fa-lightbulb"></i> <span id="ledTitle">LED Controls</span></h2>
+      <div class="led-grid">
+        <!-- White LED -->
+        <div class="led-item">
+          <div class="led-icon white-led" id="whiteLedIcon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <p class="led-label">White LED</p>
+          <p class="led-label-tagalog hidden">Puting LED</p>
+          <div class="led-buttons">
+            <button class="led-btn on-btn" data-led="white" data-action="on">ON</button>
+            <button class="led-btn off-btn" data-led="white" data-action="off">OFF</button>
+          </div>
+        </div>
+
+        <!-- Blue LED -->
+        <div class="led-item">
+          <div class="led-icon blue-led" id="blueLedIcon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <p class="led-label">Blue LED</p>
+          <p class="led-label-tagalog hidden">Asul na LED</p>
+          <div class="led-buttons">
+            <button class="led-btn on-btn" data-led="blue" data-action="on">ON</button>
+            <button class="led-btn off-btn" data-led="blue" data-action="off">OFF</button>
+          </div>
+        </div>
+
+        <!-- Red LED -->
+        <div class="led-item">
+          <div class="led-icon red-led" id="redLedIcon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <p class="led-label">Red LED</p>
+          <p class="led-label-tagalog hidden">Pulang LED</p>
+          <div class="led-buttons">
+            <button class="led-btn on-btn" data-led="red" data-action="on">ON</button>
+            <button class="led-btn off-btn" data-led="red" data-action="off">OFF</button>
+          </div>
+        </div>
+
+        <!-- Buzzer -->
+        <div class="led-item">
+          <div class="led-icon buzzer" id="buzzerIcon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <p class="led-label">Buzzer</p>
+          <p class="led-label-tagalog hidden">Buzzer</p>
+          <div class="led-buttons">
+            <button class="led-btn buzz-btn" data-led="buzzer" data-action="buzz">
+              <i class="fas fa-volume-up"></i> BUZZ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Controls -->
+      <div class="all-controls">
+        <button id="allOnBtn" class="btn all-btn">
+          <i class="fas fa-power-off"></i> <span id="allOnText">All ON</span>
+        </button>
+        <button id="allOffBtn" class="btn all-btn off">
+          <i class="fas fa-power-off"></i> <span id="allOffText">All OFF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification hidden">
+      <div class="notification-content">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="notificationText"></span>
+      </div>
+      <button id="closeNotification" class="notification-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>
