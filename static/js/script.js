@@ -431,8 +431,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } catch (error) {
       console.error('Error processing command:', error);
-      commandStatus.textContent = '✗ Error processing command';
-      commandStatus.className = 'command-status error';
+      // commandStatus.textContent = '✗ Error processing command';
+      //commandStatus.className = 'command-status error';
     }
   }
 
