@@ -1,0 +1,7 @@
+flask
+SpeechRecognition
+pyaudio
+gpiozero
+lgpio
+adafruit-circuitpython-dht
+google-generativeai

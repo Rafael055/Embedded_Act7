@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Controlled LEDs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <header>
+    <h1><i class="fas fa-microphone"></i> Voice Controlled LEDs</h1>
+    <p class="subtitle">OGAY - Activity 7 | EXPLORING A VOICE CONTROLLED LED'S WITH WEBSITE WITH LANGUAGES</p>
+  </header>
+
+  <div class="main-layout">
+    <!-- LEFT COLUMN: Language & Voice Settings -->
+    <div class="left-column">
+      <!-- Language Selection -->
+      <div class="card language-card">
+        <h2><i class="fas fa-language"></i> Language / Wika</h2>
+        <div class="language-selector">
+          <button id="langEnglish" class="lang-btn active" data-lang="en-US">
+            <span class="flag">🇺🇸</span> English
+          </button>
+          <button id="langTagalog" class="lang-btn" data-lang="fil-PH">
+            <span class="flag">🇵🇭</span> Tagalog
+          </button>
+        </div>
+
+        <h2><i class="fas fa-user-circle"></i> <span id="voiceSelectTitle">Voice Assistant</span></h2>
+        <div class="voice-selector">
+          <button id="voiceMale" class="voice-type-btn active" data-voice="male">
+            <i class="fas fa-mars"></i> <span id="voiceMaleText">Male Voice</span>
+          </button>
+          <button id="voiceFemale" class="voice-type-btn" data-voice="female">
+            <i class="fas fa-venus"></i> <span id="voiceFemaleText">Female Voice</span>
+          </button>
+        </div>
+        <div class="voice-test">
+          <button id="testVoiceBtn" class="test-voice-btn">
+            <i class="fas fa-volume-up"></i> <span id="testVoiceText">Test Voice</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE COLUMN: Voice Control -->
+    <div class="middle-column">
+      <!-- Voice Control Section -->
+      <div class="card voice-card">
+        <h2><i class="fas fa-microphone-alt"></i> <span id="voiceTitle">Voice Control</span></h2>
+        <div class="voice-control">
+          <button id="voiceBtn" class="voice-btn">
+            <i class="fas fa-microphone"></i>
+            <span id="voiceBtnText">Start Listening</span>
+          </button>
+          <div id="listeningIndicator" class="listening-indicator hidden">
+            <div class="pulse-ring"></div>
+            <i class="fas fa-microphone"></i>
+          </div>
+        </div>
+        <p id="recognizedText" class="recognized-text"></p>
+        <p id="commandStatus" class="command-status"></p>
+
+        <!-- AI-Powered Command Info -->
+        <div class="ai-info">
+          <p><i class="fas fa-brain"></i> <strong>AI-Powered Voice Control</strong></p>
+          <p>Speak naturally! The AI understands your commands in <span id="aiLanguage">English</span>.</p>
+          <p class="ai-examples">
+            <span class="ai-tag">Examples: "Turn the white light on" • "Make the blue LED blink" • "Switch off all
+              lights"</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- LED Controls -->
+      <div class="card led-card">
+        <h2><i class="fas fa-lightbulb"></i> <span id="ledTitle">LED Controls</span></h2>
+        <div class="led-grid">
+          <!-- White LED -->
+          <div class="led-item">
+            <div class="led-icon white-led" id="whiteLedIcon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <p class="led-label">White LED</p>
+            <p class="led-label-tagalog hidden">Puting LED</p>
+            <div class="led-buttons">
+              <button class="led-btn on-btn" data-led="white" data-action="on">ON</button>
+              <button class="led-btn off-btn" data-led="white" data-action="off">OFF</button>
+              <button class="led-btn blink-btn" data-led="white" data-action="blink"><i
+                  class="fas fa-sync-alt"></i></button>
+            </div>
+          </div>
+
+          <!-- Blue LED -->
+          <div class="led-item">
+            <div class="led-icon blue-led" id="blueLedIcon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <p class="led-label">Blue LED</p>
+            <p class="led-label-tagalog hidden">Asul na LED</p>
+            <div class="led-buttons">
+              <button class="led-btn on-btn" data-led="blue" data-action="on">ON</button>
+              <button class="led-btn off-btn" data-led="blue" data-action="off">OFF</button>
+              <button class="led-btn blink-btn" data-led="blue" data-action="blink"><i
+                  class="fas fa-sync-alt"></i></button>
+            </div>
+          </div>
+
+          <!-- Red LED -->
+          <div class="led-item">
+            <div class="led-icon red-led" id="redLedIcon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <p class="led-label">Red LED</p>
+            <p class="led-label-tagalog hidden">Pulang LED</p>
+            <div class="led-buttons">
+              <button class="led-btn on-btn" data-led="red" data-action="on">ON</button>
+              <button class="led-btn off-btn" data-led="red" data-action="off">OFF</button>
+              <button class="led-btn blink-btn" data-led="red" data-action="blink"><i
+                  class="fas fa-sync-alt"></i></button>
+            </div>
+          </div>
+
+          <!-- Buzzer -->
+          <div class="led-item">
+            <div class="led-icon buzzer" id="buzzerIcon">
+              <i class="fas fa-bell"></i>
+            </div>
+            <p class="led-label">Buzzer</p>
+            <p class="led-label-tagalog hidden">Buzzer</p>
+            <div class="led-buttons">
+              <button class="led-btn buzz-btn" data-led="buzzer" data-action="buzz">
+                <i class="fas fa-volume-up"></i> BUZZ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Controls -->
+        <div class="all-controls">
+          <button id="allOnBtn" class="btn all-btn">
+            <i class="fas fa-power-off"></i> <span id="allOnText">All ON</span>
+          </button>
+          <button id="allOffBtn" class="btn all-btn off">
+            <i class="fas fa-power-off"></i> <span id="allOffText">All OFF</span>
+          </button>
+          <button id="allBlinkBtn" class="btn all-btn blink">
+            <i class="fas fa-sync-alt"></i> <span id="allBlinkText">Blink All</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- DHT11 Sensor Card -->
+      <div class="card dht-card">
+        <h2><i class="fas fa-thermometer-half"></i> <span id="dhtTitle">Temperature & Humidity</span></h2>
+        <div class="dht-grid">
+          <div class="dht-item temperature">
+            <div class="dht-icon">
+              <i class="fas fa-temperature-high"></i>
+            </div>
+            <div class="dht-value">
+              <span id="temperatureValue">--</span>
+              <span class="dht-unit">°C</span>
+            </div>
+            <p class="dht-label">Temperature</p>
+            <p class="dht-label-tagalog hidden">Temperatura</p>
+          </div>
+          <div class="dht-item humidity">
+            <div class="dht-icon">
+              <i class="fas fa-tint"></i>
+            </div>
+            <div class="dht-value">
+              <span id="humidityValue">--</span>
+              <span class="dht-unit">%</span>
+            </div>
+            <p class="dht-label">Humidity</p>
+            <p class="dht-label-tagalog hidden">Halumigmig</p>
+          </div>
+        </div>
+        <p id="dhtStatus" class="dht-status">Fetching sensor data...</p>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Robot -->
+    <div class="right-column">
+      <!-- Mini-Bot Robot Face -->
+      <div class="card robot-card">
+        <h2><i class="fas fa-robot"></i> <span id="robotTitle">Mini-Bot Assistant</span></h2>
+        <div class="robot-container">
+          <div class="robot-face">
+            <!-- Robot Antenna -->
+            <div class="robot-antenna">
+              <div class="antenna-ball" id="antennaLight"></div>
+              <div class="antenna-stem"></div>
+            </div>
+
+            <!-- Robot Head -->
+            <div class="robot-head">
+              <!-- Robot Eyes (LEDs) -->
+              <div class="robot-eyes">
+                <div class="robot-eye left-eye" id="robotLeftEye">
+                  <div class="eye-inner blue-eye-inner"></div>
+                  <div class="eye-reflection"></div>
+                </div>
+                <div class="robot-eye right-eye" id="robotRightEye">
+                  <div class="eye-inner red-eye-inner"></div>
+                  <div class="eye-reflection"></div>
+                </div>
+              </div>
+
+              <!-- Robot Nose (White LED indicator) -->
+              <div class="robot-nose" id="robotNose"></div>
+
+              <!-- Robot Mouth with Display -->
+              <div class="robot-mouth" id="robotMouth">
+                <div class="mouth-display">
+                  <span id="robotMessage">Hello! I'm your assistant.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Robot Status -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="notification" class="notification hidden">
+    <div class="notification-content">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span id="notificationText"></span>
+    </div>
+    <button id="closeNotification" class="notification-close">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
