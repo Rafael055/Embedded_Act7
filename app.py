@@ -52,8 +52,6 @@ COMMANDS = {
     }
 }
 
-
-
 def process_voice_command(text, language):
     """Process voice command using hardcoded patterns"""
     text = text.lower().strip()
@@ -76,8 +74,8 @@ def process_voice_command(text, language):
 
 def execute_command(action):
     """Execute the LED/buzzer command"""
-    result = {'success': True, 'states': {}}
-    
+    result = {'success': True, 'states': {}} 
+
     if action == 'white_on':
         led_controller.turn_on_white()
     elif action == 'white_off':
