@@ -3,13 +3,6 @@ import threading
 import time
 import speech_recognition as sr
 from Leds import LEDController
-import google.generativeai as genai
-import os
-import json
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 app = Flask(__name__)
 
@@ -23,17 +16,7 @@ microphone = sr.Microphone()
 # Current language setting (default: English)
 current_language = 'en-US'
 
-# Gemini AI Configuration
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel('gemini-pro')
-    print(f"✓ Gemini AI initialized with API key: {GEMINI_API_KEY[:10]}...")
-else:
-    gemini_model = None
-    print("WARNING: GEMINI_API_KEY not set. Using fallback command processing.")
-
-# Voice command mappings for fallback (when Gemini fails)
+# Voice command mappings
 COMMANDS = {
     'en-US': {
         'white_on': ['turn on white', 'white on', 'switch on white'],
@@ -71,67 +54,8 @@ COMMANDS = {
 
 
 
-def process_with_gemini(text, language):
-    """Process voice command using Gemini AI"""
-    if not gemini_model:
-        return None
-    
-    try:
-        lang_name = "English" if language == 'en-US' else "Filipino/Tagalog"
-        
-        prompt = f"""You are an LED control system assistant. The user speaks in {lang_name}.
-Analyze this command: "{text}"
-
-Available LED colors: white, blue, red
-Available actions: on/off/blink
-- "on" includes: turn on, switch on, open, activate, enable, power on, start
-- "off" includes: turn off, switch off, close, deactivate, disable, power off, stop, shut off
-- "blink" includes: blink, flash, flicker, pulse
-- "all" or "everything" means all LEDs together
-- "lights" or "LEDs" or "light" all mean LEDs
-- "buzzer" means activate the buzzer/beep sound
-
-Examples:
-- "switch on all lights" → all_on
-- "turn on the white" → white_on
-- "flash blue" → blue_blink
-- "turn everything off" → all_off
-- "open red light" → red_on
-
-Return ONLY a JSON object with this format:
-{{"action": "color_action", "success": true}}
-
-Valid action values:
-- white_on, white_off, white_blink
-- blue_on, blue_off, blue_blink
-- red_on, red_off, red_blink
-- all_on, all_off, all_blink
-- buzzer
-- unknown (if you can't understand the command)
-
-If the user mentions unsupported colors (green, yellow, orange, purple, pink, etc), return:
-{{"action": "invalid_color", "success": false, "color": "color_name"}}
-
-Return ONLY the JSON, no explanations."""
-
-        response = gemini_model.generate_content(prompt)
-        result = json.loads(response.text.strip())
-        
-        # Ensure required fields exist
-        if 'success' not in result:
-            result['success'] = result.get('action') != 'unknown'
-        if 'invalid_color' not in result:
-            result['invalid_color'] = result.get('action') == 'invalid_color'
-            
-        return result
-        
-    except Exception as e:
-        print(f"Gemini AI Error: {e}")
-        print(f"Response text: {response.text if 'response' in locals() else 'No response'}")
-        return None
-
-def process_voice_command_fallback(text, language):
-    """Fallback: Process voice command using hardcoded patterns"""
+def process_voice_command(text, language):
+    """Process voice command using hardcoded patterns"""
     text = text.lower().strip()
     commands = COMMANDS.get(language, COMMANDS['en-US'])
     
@@ -149,16 +73,6 @@ def process_voice_command_fallback(text, language):
             return {'action': 'invalid_color', 'success': False, 'invalid_color': True, 'color': invalid_color}
     
     return {'action': 'unknown', 'success': False, 'invalid_color': False}
-
-def process_voice_command(text, language):
-    """Process voice command - tries Gemini first, falls back to hardcoded"""
-    # Try Gemini AI first
-    gemini_result = process_with_gemini(text, language)
-    if gemini_result:
-        return gemini_result
-    
-    # Fallback to hardcoded patterns
-    return process_voice_command_fallback(text, language)
 
 def execute_command(action):
     """Execute the LED/buzzer command"""

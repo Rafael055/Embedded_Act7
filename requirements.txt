@@ -2,6 +2,8 @@ flask
 SpeechRecognition
 pyaudio
 gpiozero
-lgpio
 adafruit-circuitpython-dht
-google-generativeai
+
+# System dependencies required:
+# sudo apt-get install portaudio19-dev swig python3-lgpio
+# Note: lgpio is installed via apt (python3-lgpio), use --system-site-packages in venv
