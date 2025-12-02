@@ -9,9 +9,9 @@ app = Flask(__name__)
 # Initialize LED controller
 led_controller = LEDController()
 
-# Voice recognition settings
+# Voice recognition settings (optional - only needed if using Pi's microphone)
 recognizer = sr.Recognizer()
-microphone = sr.Microphone()
+microphone = None  # Not required - voice recognition uses browser's Web Speech API
 
 # Current language setting (default: English)
 current_language = 'en-US'
