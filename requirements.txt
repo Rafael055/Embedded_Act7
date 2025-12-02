@@ -3,7 +3,9 @@ SpeechRecognition
 pyaudio
 gpiozero
 adafruit-circuitpython-dht
+lgpio
+RPi.GPIO
 
 # System dependencies required:
-# sudo apt-get install portaudio19-dev swig python3-lgpio
-# Note: lgpio is installed via apt (python3-lgpio), use --system-site-packages in venv
+# sudo apt-get install portaudio19-dev swig liblgpio-dev
+# pip install lgpio RPi.GPIO

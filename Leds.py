@@ -10,7 +10,7 @@ Device.pin_factory = LGPIOFactory()
 
 # Raspberry Pi Physical Pin Numbers (Board mode) -> BCM GPIO mapping
 # Buzzer - Pin 11 -> GPIO 17
-# White LED - Pin 40 -> GPIO 21
+# Green LED - Pin 40 -> GPIO 21
 # Blue LED - Pin 38 -> GPIO 20
 # Red LED - Pin 36 -> GPIO 16
 # DHT11 - Pin 32 -> GPIO 12
@@ -19,13 +19,13 @@ class LEDController:
     def __init__(self):
         # BCM GPIO numbers
         self.BUZZER_GPIO = 17   # Physical Pin 11
-        self.WHITE_GPIO = 21    # Physical Pin 40
+        self.GREEN_GPIO = 21    # Physical Pin 40
         self.BLUE_GPIO = 20     # Physical Pin 38
         self.RED_GPIO = 16      # Physical Pin 36
         self.DHT_GPIO = 12      # Physical Pin 32
         
         # Initialize components using gpiozero
-        self.white_led = LED(self.WHITE_GPIO)
+        self.green_led = LED(self.GREEN_GPIO)
         self.blue_led = LED(self.BLUE_GPIO)
         self.red_led = LED(self.RED_GPIO)
         self.buzzer = GpioZeroBuzzer(self.BUZZER_GPIO)
@@ -35,11 +35,11 @@ class LEDController:
         
         # Initial state - all off
         self.led_states = {
-            'white': False,
+            'green': False,
             'blue': False,
             'red': False,
             'buzzer': False,
-            'white_blink': False,
+            'green_blink': False,
             'blue_blink': False,
             'red_blink': False
         }
@@ -51,17 +51,17 @@ class LEDController:
         # Turn all off initially
         self.all_off()
     
-    def turn_on_white(self):
-        self.stop_blink_flags['white'] = True
-        self.white_led.on()
-        self.led_states['white'] = True
-        self.led_states['white_blink'] = False
+    def turn_on_green(self):
+        self.stop_blink_flags['green'] = True
+        self.green_led.on()
+        self.led_states['green'] = True
+        self.led_states['green_blink'] = False
         
-    def turn_off_white(self):
-        self.stop_blink_flags['white'] = True
-        self.white_led.off()
-        self.led_states['white'] = False
-        self.led_states['white_blink'] = False
+    def turn_off_green(self):
+        self.stop_blink_flags['green'] = True
+        self.green_led.off()
+        self.led_states['green'] = False
+        self.led_states['green_blink'] = False
     
     def turn_on_blue(self):
         self.stop_blink_flags['blue'] = True
@@ -87,12 +87,12 @@ class LEDController:
         self.led_states['red'] = False
         self.led_states['red_blink'] = False
     
-    def toggle_white(self):
-        if self.led_states['white']:
-            self.turn_off_white()
+    def toggle_green(self):
+        if self.led_states['green']:
+            self.turn_off_green()
         else:
-            self.turn_on_white()
-        return self.led_states['white']
+            self.turn_on_green()
+        return self.led_states['green']
     
     def toggle_blue(self):
         if self.led_states['blue']:
@@ -132,33 +132,33 @@ class LEDController:
             led.off()
             time.sleep(interval)
     
-    def blink_white(self, times=None, interval=0.5):
-        """Blink white LED - continuous if times=None"""
+    def blink_green(self, times=None, interval=0.5):
+        """Blink green LED - continuous if times=None"""
         import threading
         
         # Stop any existing blink
-        self.stop_blink_flags['white'] = True
-        if 'white' in self.blink_threads:
-            self.blink_threads['white'].join(timeout=1)
+        self.stop_blink_flags['green'] = True
+        if 'green' in self.blink_threads:
+            self.blink_threads['green'].join(timeout=1)
         
         if times is None:
             # Continuous blinking
-            self.stop_blink_flags['white'] = False
-            thread = threading.Thread(target=self._blink_continuous, args=(self.white_led, 'white', interval))
+            self.stop_blink_flags['green'] = False
+            thread = threading.Thread(target=self._blink_continuous, args=(self.green_led, 'green', interval))
             thread.daemon = True
             thread.start()
-            self.blink_threads['white'] = thread
-            self.led_states['white'] = False
-            self.led_states['white_blink'] = True
+            self.blink_threads['green'] = thread
+            self.led_states['green'] = False
+            self.led_states['green_blink'] = True
         else:
             # Fixed number of blinks
             for _ in range(times):
-                self.white_led.on()
+                self.green_led.on()
                 time.sleep(interval)
-                self.white_led.off()
+                self.green_led.off()
                 time.sleep(interval)
-            self.led_states['white'] = False
-            self.led_states['white_blink'] = False
+            self.led_states['green'] = False
+            self.led_states['green_blink'] = False
     
     def blink_blue(self, times=None, interval=0.5):
         """Blink blue LED - continuous if times=None"""
@@ -220,58 +220,58 @@ class LEDController:
         """Blink all LEDs"""
         if times is None:
             # Start all continuous blinking
-            self.blink_white(times=None, interval=interval)
+            self.blink_green(times=None, interval=interval)
             self.blink_blue(times=None, interval=interval)
             self.blink_red(times=None, interval=interval)
         else:
             # Fixed number of blinks
             for _ in range(times):
-                self.white_led.on()
+                self.green_led.on()
                 self.blue_led.on()
                 self.red_led.on()
                 time.sleep(interval)
-                self.white_led.off()
+                self.green_led.off()
                 self.blue_led.off()
                 self.red_led.off()
                 time.sleep(interval)
-            self.led_states['white'] = False
+            self.led_states['green'] = False
             self.led_states['blue'] = False
             self.led_states['red'] = False
-            self.led_states['white_blink'] = False
+            self.led_states['green_blink'] = False
             self.led_states['blue_blink'] = False
             self.led_states['red_blink'] = False
     
     def all_off(self):
         # Stop all blinking
-        for color in ['white', 'blue', 'red']:
+        for color in ['green', 'blue', 'red']:
             self.stop_blink_flags[color] = True
         
-        self.white_led.off()
+        self.green_led.off()
         self.blue_led.off()
         self.red_led.off()
         self.buzzer.off()
         self.led_states = {
-            'white': False,
+            'green': False,
             'blue': False,
             'red': False,
             'buzzer': False,
-            'white_blink': False,
+            'green_blink': False,
             'blue_blink': False,
             'red_blink': False
         }
     
     def all_on(self):
         # Stop all blinking
-        for color in ['white', 'blue', 'red']:
+        for color in ['green', 'blue', 'red']:
             self.stop_blink_flags[color] = True
         
-        self.white_led.on()
+        self.green_led.on()
         self.blue_led.on()
         self.red_led.on()
-        self.led_states['white'] = True
+        self.led_states['green'] = True
         self.led_states['blue'] = True
         self.led_states['red'] = True
-        self.led_states['white_blink'] = False
+        self.led_states['green_blink'] = False
         self.led_states['blue_blink'] = False
         self.led_states['red_blink'] = False
     
@@ -302,7 +302,7 @@ class LEDController:
     
     def cleanup(self):
         self.all_off()
-        self.white_led.close()
+        self.green_led.close()
         self.blue_led.close()
         self.red_led.close()
         self.buzzer.close()
@@ -315,8 +315,8 @@ if __name__ == "__main__":
     
     print("Testing LEDs...")
     
-    print("White LED ON")
-    controller.turn_on_white()
+    print("Green LED ON")
+    controller.turn_on_green()
     time.sleep(1)
     
     print("Blue LED ON")

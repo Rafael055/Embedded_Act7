@@ -19,36 +19,36 @@ current_language = 'en-US'
 # Voice command mappings
 COMMANDS = {
     'en-US': {
-        'white_on': ['turn on white', 'white on', 'switch on white'],
-        'white_off': ['turn off white', 'white off', 'switch off white'],
+        'green_on': ['turn on green', 'green on', 'switch on green'],
+        'green_off': ['turn off green', 'green off', 'switch off green'],
         'blue_on': ['turn on blue', 'blue on', 'switch on blue'],
         'blue_off': ['turn off blue', 'blue off', 'switch off blue'],
         'red_on': ['turn on red', 'red on', 'switch on red'],
         'red_off': ['turn off red', 'red off', 'switch off red'],
         'all_on': ['turn on all', 'all on', 'turn on all', 'all lights on'],
         'all_off': ['turn off all', 'all off', 'switch off all', 'all lights off'],
-        'white_blink': ['blink white', 'flash white'],
+        'green_blink': ['blink green', 'flash green'],
         'blue_blink': ['blink blue', 'flash blue'],
         'red_blink': ['blink red', 'flash red'],
         'all_blink': ['blink all', 'flash all'],
         'buzzer': ['buzzer', 'buzz', 'beep'],
-        'invalid_color_keywords': ['green', 'yellow', 'orange', 'purple', 'pink', 'black', 'brown', 'grey', 'gray', 'violet', 'cyan', 'magenta']
+        'invalid_color_keywords': ['white', 'yellow', 'orange', 'purple', 'pink', 'black', 'brown', 'grey', 'gray', 'violet', 'cyan', 'magenta']
     },
     'fil-PH': {
-        'white_on': ['buksan ang puting ilaw', 'i on puting ilaw'],
-        'white_off': ['patayin ang puting ilaw', 'i off puting ilaw'],
+        'green_on': ['buksan ang berdeng ilaw', 'i on berdeng ilaw'],
+        'green_off': ['patayin ang berdeng ilaw', 'i off berdeng ilaw'],
         'blue_on': ['buksan ang asul na ilaw', 'i on asul na ilaw'],
         'blue_off': ['patayin ang asul na ilaw', 'i off asul na ilaw'],
         'red_on': ['buksan ang pulang ilaw', 'i on pulang ilaw'],
         'red_off': ['patayin ang pulang ilaw', 'i off pulang ilaw'],
         'all_on': ['buksan ang lahat ng ilaw', 'i on lahat'],
         'all_off': ['patayin ang lahat ng ilaw', 'i off lahat'],
-        'white_blink': ['i blink ang puting ilaw', 'pakurap puting ilaw'],
+        'green_blink': ['i blink ang berdeng ilaw', 'pakurap berdeng ilaw'],
         'blue_blink': ['i blink ang asul na ilaw', 'pakurap asul na ilaw'],
         'red_blink': ['i blink ang pulang ilaw', 'pakurap pulang ilaw'],
         'all_blink': ['i blink lahat', 'pakurap lahat'],
         'buzzer': ['buzzer', 'tunog', 'beep'],
-        'invalid_color_keywords': ['berde', 'dilaw', 'orange', 'lila', 'rosas', 'itim', 'kayumanggi', 'abo', 'violet']
+        'invalid_color_keywords': ['puti', 'dilaw', 'orange', 'lila', 'rosas', 'itim', 'kayumanggi', 'abo', 'violet']
     }
 }
 
@@ -76,10 +76,10 @@ def execute_command(action):
     """Execute the LED/buzzer command"""
     result = {'success': True, 'states': {}} 
 
-    if action == 'white_on':
-        led_controller.turn_on_white()
-    elif action == 'white_off':
-        led_controller.turn_off_white()
+    if action == 'green_on':
+        led_controller.turn_on_green()
+    elif action == 'green_off':
+        led_controller.turn_off_green()
     elif action == 'blue_on':
         led_controller.turn_on_blue()
     elif action == 'blue_off':
@@ -92,8 +92,8 @@ def execute_command(action):
         led_controller.all_on()
     elif action == 'all_off':
         led_controller.all_off()
-    elif action == 'white_blink':
-        led_controller.blink_white()
+    elif action == 'green_blink':
+        led_controller.blink_green()
     elif action == 'blue_blink':
         led_controller.blink_blue()
     elif action == 'red_blink':
@@ -116,13 +116,13 @@ def index():
 def control_led(led_name, action):
     """Control LED via button click"""
     try:
-        if led_name == 'white':
+        if led_name == 'green':
             if action == 'on':
-                led_controller.turn_on_white()
+                led_controller.turn_on_green()
             elif action == 'blink':
-                led_controller.blink_white()
+                led_controller.blink_green()
             else:
-                led_controller.turn_off_white()
+                led_controller.turn_off_green()
         elif led_name == 'blue':
             if action == 'on':
                 led_controller.turn_on_blue()

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const aiLanguage = document.getElementById('aiLanguage');
 
   // LED icons
-  const whiteLedIcon = document.getElementById('whiteLedIcon');
+  const greenLedIcon = document.getElementById('greenLedIcon');
   const blueLedIcon = document.getElementById('blueLedIcon');
   const redLedIcon = document.getElementById('redLedIcon');
   const buzzerIcon = document.getElementById('buzzerIcon');
@@ -406,8 +406,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Speak error
         const errorMsg = currentLanguage === 'en-US'
-          ? `Sorry, ${data.color} LED is not available. Only white, blue, and red LEDs are available.`
-          : `Pasensya, ang ${data.color} na LED ay hindi available. White, blue, at red LED lamang ang available.`;
+          ? `Sorry, ${data.color} LED is not available. Only green, blue, and red LEDs are available.`
+          : `Pasensya, ang ${data.color} na LED ay hindi available. Green, blue, at red LED lamang ang available.`;
         speak(errorMsg);
         updateRobotMessage(data.message);
         updateRobotStatus(t.robotError);
@@ -446,16 +446,16 @@ document.addEventListener('DOMContentLoaded', function () {
     robotRightEye.classList.toggle('on', states.red);
     robotRightEye.classList.toggle('blinking-led', states.red_blink);
 
-    // Nose = White LED
-    robotNose.classList.toggle('on', states.white);
-    robotNose.classList.toggle('blinking', states.white_blink);
+    // Nose = Green LED
+    robotNose.classList.toggle('on', states.green);
+    robotNose.classList.toggle('blinking', states.green_blink);
   }
 
   function formatAction(action) {
     const actionLabels = {
-      'white_on': 'White LED ON',
-      'white_off': 'White LED OFF',
-      'white_blink': 'White LED Blinking',
+      'green_on': 'Green LED ON',
+      'green_off': 'Green LED OFF',
+      'green_blink': 'Green LED Blinking',
       'blue_on': 'Blue LED ON',
       'blue_off': 'Blue LED OFF',
       'blue_blink': 'Blue LED Blinking',
@@ -472,9 +472,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Update LED visual states
   function updateLEDStates(states) {
-    // White LED
-    whiteLedIcon.classList.toggle('on', states.white);
-    whiteLedIcon.classList.toggle('blinking', states.white_blink);
+    // Green LED
+    greenLedIcon.classList.toggle('on', states.green);
+    greenLedIcon.classList.toggle('blinking', states.green_blink);
 
     // Blue LED
     blueLedIcon.classList.toggle('on', states.blue);
