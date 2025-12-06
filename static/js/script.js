@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
       dhtTitle: 'Temperature & Humidity',
       dhtFetching: 'Fetching sensor data...',
       dhtUpdated: 'Last updated:',
-      dhtError: 'Error reading sensor',
+      //  dhtError: 'Error reading sensor',
       voiceSelectTitle: 'Voice Assistant',
       maleVoice: 'Male Voice',
       femaleVoice: 'Female Voice',
