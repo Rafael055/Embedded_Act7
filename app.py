@@ -42,7 +42,7 @@ COMMANDS = {
         'red_on': ['buksan ang pulang ilaw', 'i on pulang ilaw'],
         'red_off': ['patayin ang pulang ilaw', 'i off pulang ilaw'],
         'all_on': ['buksan ang lahat ng ilaw', 'i on lahat'],
-        'all_off': ['patayin ang lahat ng ilaw', 'i off lahat'],
+        'all_off': ['patayin lahat ng ilaw', 'i off lahat'],
         'green_blink': ['i blink ang berdeng ilaw', 'pakurap berdeng ilaw'],
         'blue_blink': ['i blink ang asul na ilaw', 'pakurap asul na ilaw'],
         'red_blink': ['i blink ang pulang ilaw', 'pakurap pulang ilaw'],
