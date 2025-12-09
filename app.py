@@ -36,9 +36,9 @@ COMMANDS = {
     },
     'fil-PH': {
         'green_on': ['buksan ang berdeng ilaw', 'i on berdeng ilaw'],
-        'green_off': ['patayin ang berdeng ilaw', 'i off berdeng ilaw'],
-        'blue_on': ['buksan ang asul na ilaw', 'i on asul na ilaw'],
-        'blue_off': ['patayin ang asul na ilaw', 'i off asul na ilaw'],
+        'green_off': ['patayin berdeng ilaw', 'i off berdeng ilaw'],
+        'blue_on': ['buksan asul na ilaw', 'i on asul na ilaw'],
+        'blue_off': ['patayin asul na ilaw', 'i off asul na ilaw'],
         'red_on': ['buksan ang pulang ilaw', 'i on pulang ilaw'],
         'red_off': ['patayin ang pulang ilaw', 'i off pulang ilaw'],
         'all_on': ['buksan lahat ng ilaw', 'i on lahat'],
